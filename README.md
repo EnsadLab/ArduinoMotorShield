@@ -40,9 +40,9 @@ bottom pin number: 9
 
 ### steppers (Nema steppers)
 
-For M1-M2 connection -> From top to bottom: black, green, red and blue
+For M1-M2 connection -> From top to bottom: black, green, nothing, red and blue
 
-For M3-M4 connection -> From top to bottom: blue, red, green and black
+For M3-M4 connection -> From top to bottom: blue, red, nothing, green and black
 
 ### power
 The 5V powered from the arduino usb cable is enough for servos and the steppers(that I used).
