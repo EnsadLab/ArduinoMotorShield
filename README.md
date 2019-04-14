@@ -3,11 +3,11 @@
 - Arduino tested with software version 1.8.5 and the arduino Uno board
 
 ## libraries that need to be installed
-# Arduino
+### Arduino
 - Adafruit motor shield V2 library
 - AccelStepper library
 
-# Processing
+### Processing
 - ControlP5 library
 - The MidiBus library
 
@@ -29,12 +29,12 @@ arduino cable --- |				  |
 				  -----------------
 	
 
-# servos
+### servos
 From left to right: brown/red/orange
 Top pin number(at the edge of the board): 10
 bottom pin number: 9
 
-# steppers (Nema steppers)
+### steppers (Nema steppers)
 
 For M1-M2 connection -> From top to bottom: black, green, red and blue
 For M3-M4 connection -> From top to bottom: blue, red, green and black
@@ -46,8 +46,8 @@ The 5V powered from the arduino usb cable is enough for servos and the steppers(
 If you want to upload the arduino code again to the board, do not forget to stop running the processing application, because we first need to close the serial port.
 
 ## further documentation
-# adafruit motor shield tutorial
+### adafruit motor shield tutorial
 https://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino/overview
 
-# Accel library used to control the steppers
+### Accel library used to control the steppers
 https://www.airspayce.com/mikem/arduino/AccelStepper/index.html
