@@ -15,12 +15,14 @@
 Once you have installed all necessary libraries and connect the motors to the board, upload the arduino code onto the arduino board and run the processing application.
 CAREFUL: please check if the correct serial port has been selected in the processing application. Check the console for the listed available ports and go to the constructor of the "ArduinoSerial" class in order to change the port index. 
 
+``` javascript
 String portName = Serial.list()[3]; // 0,1,2 or 3 or ...
+```
 
 ## hardware connections
 
 Given the following direction of the arduino shield.
-
+``` 
 				  -----------------
 arduino cable --- |				  |
 				  |				  |
@@ -28,15 +30,18 @@ arduino cable --- |				  |
 				  |				  |
 				  -----------------
 	
-
+```
 ### servos
 From left to right: brown/red/orange
+
 Top pin number(at the edge of the board): 10
+
 bottom pin number: 9
 
 ### steppers (Nema steppers)
 
 For M1-M2 connection -> From top to bottom: black, green, red and blue
+
 For M3-M4 connection -> From top to bottom: blue, red, green and black
 
 ## power
