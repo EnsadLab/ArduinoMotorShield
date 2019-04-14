@@ -21,7 +21,7 @@ String portName = Serial.list()[3]; // 0,1,2 or 3 or ...
 
 ## hardware connections
 
-Given the following direction of the arduino shield.
+Given the following direction of the arduino shield. (oups...)
 ``` 
 				  -----------------
 arduino cable --- |				  |
@@ -44,7 +44,7 @@ For M1-M2 connection -> From top to bottom: black, green, red and blue
 
 For M3-M4 connection -> From top to bottom: blue, red, green and black
 
-## power
+### power
 The 5V powered from the arduino usb cable is enough for servos and the steppers(that I used).
 
 ## good to know
