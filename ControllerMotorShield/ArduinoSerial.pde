@@ -47,18 +47,21 @@ class ArduinoSerial
       port.write('\n');
       
       //to be checked...
-      //delay(50);
+      //Probably better for arduino com but introduces too much latency in the GUI.
+      //delay(30);
    }
    
    
    // prints out on the console DEBUGGING messages from Arduino (instead of using the arduino serial monitor)
    void listen()
    {
+     
        if ( port.available() > 0) {  // If data is available,
           String msg = port.readStringUntil('\n');
           if(msg != null) 
             print("Arduino received:",msg);
        }
+       
    }
     
 };

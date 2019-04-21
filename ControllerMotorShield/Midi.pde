@@ -30,7 +30,7 @@ void controllerChange(int channel, int num, int value)
     if( num >= 0 && num<8) // midi sliders
     {
       int motorIndex = num;
-      println("MIDI slider / motor index:",motorIndex,"value:",value);
+      //println("MIDI slider / motor index:",motorIndex,"value:",value);
       gui.setMotorValueFromMidi(motorIndex,value);
     }
     else if( (num>=16)&&(num<24) ) //knobs

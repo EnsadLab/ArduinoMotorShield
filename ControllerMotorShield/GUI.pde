@@ -43,15 +43,15 @@ class Gui implements ControlListener
       int maxv = maxValueServo;
       if(i == 2 || i == 3) { minv = minValueStepper; maxv = maxValueStepper; }
       // parameters : name, minimum, maximum, default value (float), x, y, width, height
-      sliders[i] = cp5.addSlider("SLIDERMOTORVAL_" + i,minv,maxv,0.5*(maxv-minv),250,y,300,30);
+      sliders[i] = cp5.addSlider("SLIDERMOTORVAL_" + i,minv,maxv,0.5*(maxv-minv)+minv,250,y,300,30);
       sliders[i].setSliderMode(Slider.FLEXIBLE);
       sliders[i].getValueLabel().align(ControlP5.RIGHT_OUTSIDE, ControlP5.CENTER).setFont(fontMiddle);
       sliders[i].getCaptionLabel().setVisible(false);
       sliders[i].addListener(this);
       
       Textlabel label = cp5.addTextlabel("LABELMOTORVAL_"+i).setText("motor"+i).setPosition(50,y+5).setFont(fontSmall).setColor(color(255,255,255));
-      if(i== 0) label.setText("Servo motor(pin 9)");
-      else if(i == 1) label.setText("Servo motor(pin 10)");
+      if(i== 0) label.setText("Servo motor(pin 9 - center)");
+      else if(i == 1) label.setText("Servo motor(pin 10 - edge)");
       else if(i == 2) label.setText("Stepper motor(M1-M2)");
       else if(i == 3) label.setText("Stepper motor(M3-M4)");
       else if(i == 4) label.setText("DC motor(M1)");
