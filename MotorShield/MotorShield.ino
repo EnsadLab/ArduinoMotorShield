@@ -16,25 +16,26 @@ Adafruit_MotorShield AFMShield(0x60); // Default address, no jumpers
 
 
 // ************************  servos  **************************
+// value is between 0 and 180
 Servo servoID_0;
 Servo servoID_1;
 
 
 // ***********************  steppers  *************************
-Adafruit_StepperMotor *stepperID_2 = AFMShield.getStepper(200, 1);
-Adafruit_StepperMotor *stepperID_3 = AFMShield.getStepper(200, 2);
+Adafruit_StepperMotor *stepperID_2 = AFMShield.getStepper(200, 1); // M1-M2
+Adafruit_StepperMotor *stepperID_3 = AFMShield.getStepper(200, 2); // M3-M4
 // you can change these to SINGLE, DOUBLE, INTERLEAVE or MICROSTEP!
 void forwardstepID_2() {  
-  stepperID_2->onestep(FORWARD, MICROSTEP);
+  stepperID_2->onestep(FORWARD, DOUBLE);
 }
 void backwardstepID_2() {  
-  stepperID_2->onestep(BACKWARD, MICROSTEP);
+  stepperID_2->onestep(BACKWARD, DOUBLE);
 }
 void forwardstepID_3() {  
-  stepperID_3->onestep(FORWARD, DOUBLE);
+  stepperID_3->onestep(FORWARD, MICROSTEP);
 }
 void backwardstepID_3() {  
-  stepperID_3->onestep(BACKWARD, DOUBLE);
+  stepperID_3->onestep(BACKWARD, MICROSTEP);
 }
 // Now we'll wrap the 2 steppers in an AccelStepper object
 AccelStepper acc_stepperID_2(forwardstepID_2, backwardstepID_2);
@@ -42,8 +43,20 @@ AccelStepper acc_stepperID_3(forwardstepID_3, backwardstepID_3);
 int minValueStepper = -200;
 int maxValueStepper = 200;
 
-bool velocity_mode = false;
+bool velocity_mode = true;
 
+// **************************  DC  ****************************
+// value is between 0 and 255; we use negative numbers from processing in order to know the direction so from -255 to 255
+int minValueDC = -255;
+// later we'll use an array.
+//Adafruit_DCMotor *dc_motor4 = AFMShield.getMotor(1); // M1
+Adafruit_DCMotor *dc_motor4 = NULL; // M1
+//Adafruit_DCMotor *dc_motor5 = AFMShield.getMotor(2); // M2
+Adafruit_DCMotor *dc_motor5 = NULL; // M2
+Adafruit_DCMotor *dc_motor6 = AFMShield.getMotor(3); // M3
+//Adafruit_DCMotor *dc_motor6 = NULL; // M3
+Adafruit_DCMotor *dc_motor7 = AFMShield.getMotor(4); // M4
+//Adafruit_DCMotor *dc_motor7 = NULL; // M4
 
 // *************************  DEBUG  **************************
 // PAS ENCORE FAIT...
@@ -55,7 +68,7 @@ int ledPin = 13; // Set the pin to digital I/O 4
 
 // *************************  ANIMS  **************************
 typedef enum Anim_type:byte { RANDOM,SINUS,COM } Anim_type;
-Anim_type anim_type = COM; // by default, we listen to the serial port for processing messages
+Anim_type anim_type = COM; // by default, select COM where we listen to the serial port for processing messages
 //int fakeValues[] = {0,70,40,90,100,20,170,50,70,20,180}; // tests servos
 //int fakeValues[] = {40,140}; // tests servos
 int fakeValues[] = {-200,200}; // tests steppers
@@ -103,6 +116,8 @@ void processDatas(int data[], int dataLength){
       runServo(id,value);
     }else if(id == 2 || id == 3){
       runStepper(id,value);  
+    }else if(id >= 4 && id <= 7){
+      runDC(id,value);  
     }
   }
   
@@ -131,6 +146,21 @@ void runStepper(int id,int value){
   else if(id == 3){
     if(velocity_mode) acc_stepperID_3.setSpeed(value);
     else acc_stepperID_3.moveTo(value);
+  }
+}
+
+void runDC(int id,int value){
+  Adafruit_DCMotor *dc_motor;
+  if(id == 4) dc_motor = dc_motor4;
+  else if(id == 5) dc_motor = dc_motor5;
+  else if(id == 6) dc_motor = dc_motor6;
+  else if(id == 7) dc_motor = dc_motor7;
+  value = value + minValueDC; // [0,500] -> [-250,250]
+  if(dc_motor != NULL) {
+    dc_motor->setSpeed(abs(value));
+    if(value > 0) dc_motor->run(FORWARD);
+    else if(value < 0) dc_motor->run(BACKWARD);
+    else if(value == 0) dc_motor->run(RELEASE);
   }
 }
 
@@ -172,7 +202,7 @@ void listenToCom(){
 
 void updateRandom(){
   if (delayRunning && ((millis() - delayStart) >= DELAY_TIME)) {
-    DELAY_TIME = 3000;//random(1000,3000); // check if not better to use rand(10) * 100 or something like that...
+    DELAY_TIME = 100;//random(1000,3000); // check if not better to use rand(10) * 100 or something like that...
     delayStart = millis();
     triggerRandomPos();
     //delayRunning = false; // keep running... uncomment if you want to stop running
@@ -182,15 +212,11 @@ void updateRandom(){
 void triggerRandomPos(){
   
   triggerServos();
-  triggerSteppers();
+ // triggerSteppers();
+  triggerDCs();
 
   // ou si on veut updater qu'un moteur à chaque trigger...
-  //int motorId = random(4);
-  int motorId = 5; // la suite va etre ignoré
-  if(motorId == 0) {int value = random(0,180); servoID_0.write(value);}
-  else if(motorId == 1) {int value = random(0,180); servoID_1.write(value);}
-  if(motorId == 2) {int value = random(400) - 200; acc_stepperID_2.setSpeed(value);}
-  else if(motorId == 3) {int value = random(400) - 200; acc_stepperID_3.setSpeed(value);}
+  //triggerUniqueRandomMotor(); // servos + steppers for now
   
 }
 
@@ -207,8 +233,8 @@ void triggerServos(){
 
 
 void triggerSteppers(){
-  //int value = random(400) - 200;
-  int value =  fakeValues[fakeValueIndexStepper];
+  int value = random(400) - 200;
+ // int value =  fakeValues[fakeValueIndexStepper];
   fakeValueIndexStepper++;
   if(fakeValueIndexStepper >= nbFakeValues){
     fakeValueIndexStepper = 0;  
@@ -221,13 +247,57 @@ void triggerSteppers(){
     acc_stepperID_3.setSpeed(value);
     acc_stepperID_2.moveTo(value);
     acc_stepperID_3.moveTo(value);
+    
   }
+}
 
+void triggerDCs(){
+  int value = random(500) + minValueDC;
+  triggerDC(4,value);
+  value = random(500) + minValueDC;
+  triggerDC(5,value);
+  value = random(500) + minValueDC;
+  triggerDC(6,value);
+  value = random(500) + minValueDC;
+  triggerDC(7,value);
+}
+
+void triggerDC(int id,int value){
+  Adafruit_DCMotor *dc_motor = NULL;
+  if(id == 4) dc_motor = dc_motor4;
+  else if(id == 5) dc_motor = dc_motor5;
+  else if(id == 6) dc_motor = dc_motor6;
+  else if(id == 7) dc_motor = dc_motor7;
+  value = value + minValueDC; // [0,500] -> [-250,250]
+  if(dc_motor != NULL) {
+    dc_motor->setSpeed(abs(value));
+    if(value > 0) dc_motor->run(FORWARD);
+    else if(value < 0) dc_motor->run(BACKWARD);
+    else if(value == 0) dc_motor->run(RELEASE);
+  }
 
 }
 
+void triggerUniqueRandomMotor(){
+  int motorId = random(4);
+  //int motorId = 5; // la suite va etre ignoré
+  if(motorId == 0) {int value = random(0,180); servoID_0.write(value);}
+  else if(motorId == 1) {int value = random(0,180); servoID_1.write(value);}
+  if(motorId == 2) {int value = random(400) - 200; acc_stepperID_2.setSpeed(value);}
+  else if(motorId == 3) {int value = random(400) - 200; acc_stepperID_3.setSpeed(value);}
+}
+
+void stopAllDCs(){
+  if(dc_motor4 != NULL) dc_motor4->run(RELEASE);  
+  if(dc_motor5 != NULL) dc_motor5->run(RELEASE); 
+  if(dc_motor6 != NULL) dc_motor6->run(RELEASE); 
+  if(dc_motor7 != NULL) dc_motor7->run(RELEASE); 
+}
 
 void loop() {
+
+  //stopAllDCs();
+  //return;
 
   if(anim_type == COM){
     listenToCom();

@@ -16,6 +16,8 @@ class Gui implements ControlListener
   int maxValueServo = 180;
   int minValueStepper = -200;
   int maxValueStepper = 200;
+  int minValueDC = -255;
+  int maxValueDC = 255;
   
   Gui()
   {
@@ -42,6 +44,7 @@ class Gui implements ControlListener
       int minv = minValueServo;
       int maxv = maxValueServo;
       if(i == 2 || i == 3) { minv = minValueStepper; maxv = maxValueStepper; }
+      else if(i >= 4 && i <= 7) { minv = minValueDC; maxv = maxValueDC; }
       // parameters : name, minimum, maximum, default value (float), x, y, width, height
       sliders[i] = cp5.addSlider("SLIDERMOTORVAL_" + i,minv,maxv,0.5*(maxv-minv)+minv,250,y,300,30);
       sliders[i].setSliderMode(Slider.FLEXIBLE);
@@ -50,14 +53,14 @@ class Gui implements ControlListener
       sliders[i].addListener(this);
       
       Textlabel label = cp5.addTextlabel("LABELMOTORVAL_"+i).setText("motor"+i).setPosition(50,y+5).setFont(fontSmall).setColor(color(255,255,255));
-      if(i== 0) label.setText("Servo motor(pin 9 - center)");
-      else if(i == 1) label.setText("Servo motor(pin 10 - edge)");
-      else if(i == 2) label.setText("Stepper motor(M1-M2)");
-      else if(i == 3) label.setText("Stepper motor(M3-M4)");
-      else if(i == 4) label.setText("DC motor(M1)");
-      else if(i == 5) label.setText("DC motor(M2)");
-      else if(i == 6) label.setText("DC motor(M3)");
-      else if(i == 7) label.setText("DC motor(M4)");
+      if(i== 0) label.setText("Servo motor 0(pin 9 - center)");
+      else if(i == 1) label.setText("Servo motor 1(pin 10 - edge)");
+      else if(i == 2) label.setText("Stepper motor 2(M1-M2)");
+      else if(i == 3) label.setText("Stepper motor 3(M3-M4)");
+      else if(i == 4) label.setText("DC motor 4(M1)");
+      else if(i == 5) label.setText("DC motor 5(M2)");
+      else if(i == 6) label.setText("DC motor 6(M3)");
+      else if(i == 7) label.setText("DC motor 7(M4)");
       
       y += 50;
     }
@@ -69,6 +72,7 @@ class Gui implements ControlListener
     int minv = minValueServo;
     int maxv = maxValueServo;
     if(motorIndex == 2 || motorIndex == 3) { minv = minValueStepper; maxv = maxValueStepper; }
+    else if(motorIndex >= 4 && motorIndex <= 7) { minv = minValueDC; maxv = maxValueDC; }
     float value = map(midiValue,0,127,minv,maxv);
     if(motorIndex >= 0 && motorIndex < nbMotors)
     {
@@ -81,6 +85,7 @@ class Gui implements ControlListener
     int minv = minValueServo;
     int maxv = maxValueServo;
     if(motorIndex == 2 || motorIndex == 3) { minv = minValueStepper; maxv = maxValueStepper; }
+    else if(motorIndex >= 4 && motorIndex <= 7) { minv = minValueDC; maxv = maxValueDC; }
     if(motorIndex >= 0 && motorIndex < nbMotors)
     {
        sliders[motorIndex].setValue(0.5*(maxv-minv)); 
@@ -94,6 +99,7 @@ class Gui implements ControlListener
        int minv = minValueServo;
        int maxv = maxValueServo;
        if(i == 2 || i == 3) { minv = minValueStepper; maxv = maxValueStepper; }
+       else if(i >= 4 && i <= 7) { minv = minValueDC; maxv = maxValueDC; }
        sliders[i].setValue(0.5*(maxv-minv)); 
     }
   }
@@ -116,6 +122,7 @@ class Gui implements ControlListener
           int motorIndex = int(params[1]);
           //println("SLIDER / motor index",motorIndex);
           if(motorIndex == 2 || motorIndex == 3){ value += abs(minValueStepper); }
+          else if(motorIndex >= 4 && motorIndex <= 7) { value += abs(minValueDC); }
           arduinoSerial.sendToArduino(motorIndex,int(value));
         }
       }
