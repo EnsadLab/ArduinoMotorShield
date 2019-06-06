@@ -54,5 +54,15 @@ If you want to upload the arduino code again to the board, do not forget to stop
 ### adafruit motor shield tutorial
 https://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino/overview
 
-### Accel library used to control the steppers
+### Accel library used to control the steppers with the adafruit motor shield
 https://www.airspayce.com/mikem/arduino/AccelStepper/index.html
+
+### Robotis dynamixel arduino shield documentation
+http://emanual.robotis.com/docs/en/parts/interface/dynamixel_shield/
+
+## hardware used
+- Arduino UNO
+- Adafruit Motor shield V2 (https://www.adafruit.com/product/1438)
+- Robotis Dynamixel arduino shield (https://www.mybotshop.de/DYNAMIXEL-Arduino-Shield_1)
+- motors: servos(FITEC, Modelcraft), steppers(Nema), DCs(...)
+- midi controller (8 channels)
