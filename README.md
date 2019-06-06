@@ -64,5 +64,5 @@ http://emanual.robotis.com/docs/en/parts/interface/dynamixel_shield/
 - Arduino UNO
 - Adafruit Motor shield V2 (https://www.adafruit.com/product/1438)
 - Robotis Dynamixel arduino shield (https://www.mybotshop.de/DYNAMIXEL-Arduino-Shield_1)
-- motors: servos(FITEC, Modelcraft), steppers(Nema), DCs(...)
+- motors: servos(Feetec, Modelcraft), steppers(Nema), DCs(...)
 - midi controller (8 channels)
