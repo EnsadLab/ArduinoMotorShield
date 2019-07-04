@@ -49,8 +49,8 @@ bool velocity_mode = true;
 // value is between 0 and 255; we use negative numbers from processing in order to know the direction so from -255 to 255
 int minValueDC = -255;
 // later we'll use an array.
-//Adafruit_DCMotor *dc_motor4 = AFMShield.getMotor(1); // M1
-Adafruit_DCMotor *dc_motor4 = NULL; // M1
+Adafruit_DCMotor *dc_motor4 = AFMShield.getMotor(1); // M1
+//Adafruit_DCMotor *dc_motor4 = NULL; // M1
 //Adafruit_DCMotor *dc_motor5 = AFMShield.getMotor(2); // M2
 Adafruit_DCMotor *dc_motor5 = NULL; // M2
 Adafruit_DCMotor *dc_motor6 = AFMShield.getMotor(3); // M3
@@ -212,7 +212,7 @@ void updateRandom(){
 void triggerRandomPos(){
   
   triggerServos();
- // triggerSteppers();
+  triggerSteppers();
   triggerDCs();
 
   // ou si on veut updater qu'un moteur à chaque trigger...
@@ -241,21 +241,21 @@ void triggerSteppers(){
   }
   if(velocity_mode){
     acc_stepperID_2.setSpeed(value);
-    acc_stepperID_3.setSpeed(value);
+    //acc_stepperID_3.setSpeed(value);
   }else{
     acc_stepperID_2.setSpeed(value);
-    acc_stepperID_3.setSpeed(value);
+    //acc_stepperID_3.setSpeed(value);
     acc_stepperID_2.moveTo(value);
-    acc_stepperID_3.moveTo(value);
+    //acc_stepperID_3.moveTo(value);
     
   }
 }
 
 void triggerDCs(){
   int value = random(500) + minValueDC;
-  triggerDC(4,value);
+  //triggerDC(4,value);
   value = random(500) + minValueDC;
-  triggerDC(5,value);
+  //triggerDC(5,value);
   value = random(500) + minValueDC;
   triggerDC(6,value);
   value = random(500) + minValueDC;
@@ -314,5 +314,3 @@ void loop() {
   }
 
 }
-
-

@@ -9,7 +9,7 @@ class ArduinoSerial
    ArduinoSerial(ControllerMotorShield controller)
    {
      this.controller = controller;
-     String portName = Serial.list()[3]; 
+     String portName = Serial.list()[1]; 
      String[] ports = Serial.list();
      println("Available SERIAL ports:");
      for(int i=0; i<ports.length; i++)
@@ -55,7 +55,7 @@ class ArduinoSerial
    // prints out on the console DEBUGGING messages from Arduino (instead of using the arduino serial monitor)
    void listen()
    {
-     
+       //print("is listening...");
        if ( port.available() > 0) {  // If data is available,
           String msg = port.readStringUntil('\n');
           if(msg != null) 
