@@ -38,8 +38,12 @@ void backwardstepID_3() {
   stepperID_3->onestep(BACKWARD, MICROSTEP);
 }
 // Now we'll wrap the 2 steppers in an AccelStepper object
-AccelStepper acc_stepperID_2(forwardstepID_2, backwardstepID_2);
-AccelStepper acc_stepperID_3(forwardstepID_3, backwardstepID_3);
+AccelStepper acc_stepperID_2(forwardstepID_2, backwardstepID_2); // M1-M2
+//AccelStepper acc_stepperID_2 = NULL; // => to be checked.. doesn't like the null. we should use defines as well.
+//AccelStepper acc_stepperID_3(forwardstepID_3, backwardstepID_3); // M3-M4
+bool useStepperID_2 = true;
+bool useStepperID_3 = false;
+
 int minValueStepper = -200;
 int maxValueStepper = 200;
 
@@ -93,8 +97,8 @@ void setup() {
 
   acc_stepperID_2.setMaxSpeed(2000.0); // vitesse ?
   acc_stepperID_2.setAcceleration(1000);
-  acc_stepperID_3.setMaxSpeed(2000.0);
-  acc_stepperID_3.setAcceleration(1000);
+  //acc_stepperID_3.setMaxSpeed(2000.0);
+  //acc_stepperID_3.setAcceleration(1000);
 
   DELAY_TIME = 1000;//random(1000,3000); // check if not better to use rand(10) * 100 or something like that...
   delayStart = millis();
@@ -139,13 +143,13 @@ void runStepper(int id,int value){
   String s = String("run stepper ") + id + String(" with value ") + value;
   //value = map(value,-200,200,-500,500); // valeur, min, max, minNew, maxNew => pour tester rapidement
   //Serial.println(s);
-  if(id == 2){
+  if(id == 2 && useStepperID_2){
     if(velocity_mode) acc_stepperID_2.setSpeed(value);
     else acc_stepperID_2.moveTo(value);
   }
-  else if(id == 3){
-    if(velocity_mode) acc_stepperID_3.setSpeed(value);
-    else acc_stepperID_3.moveTo(value);
+  else if(id == 3 && useStepperID_3){
+    //if(velocity_mode) acc_stepperID_3.setSpeed(value);
+    //else acc_stepperID_3.moveTo(value);
   }
 }
 
@@ -190,6 +194,8 @@ void listenToCom(){
         count++;
       }
     }  
+    //Serial.println(dataIn[0]);
+    //Serial.println(dataIn[1]);
     
     processDatas(dataIn,2);
     //Serial.println("*");
@@ -240,13 +246,13 @@ void triggerSteppers(){
     fakeValueIndexStepper = 0;  
   }
   if(velocity_mode){
-    acc_stepperID_2.setSpeed(value);
-    //acc_stepperID_3.setSpeed(value);
+    if(useStepperID_2) acc_stepperID_2.setSpeed(value);
+    //if(useStepperID_3) acc_stepperID_3.setSpeed(value);
   }else{
-    acc_stepperID_2.setSpeed(value);
-    //acc_stepperID_3.setSpeed(value);
-    acc_stepperID_2.moveTo(value);
-    //acc_stepperID_3.moveTo(value);
+    if(useStepperID_2) acc_stepperID_2.setSpeed(value);
+    //if(useStepperID_3) acc_stepperID_3.setSpeed(value);
+    if(useStepperID_2) acc_stepperID_2.moveTo(value);
+    //if(useStepperID_3) acc_stepperID_3.moveTo(value);
     
   }
 }
@@ -278,13 +284,14 @@ void triggerDC(int id,int value){
 
 }
 
+// TO BE TESTED.. so do not use for now
 void triggerUniqueRandomMotor(){
   int motorId = random(4);
   //int motorId = 5; // la suite va etre ignoré
   if(motorId == 0) {int value = random(0,180); servoID_0.write(value);}
   else if(motorId == 1) {int value = random(0,180); servoID_1.write(value);}
   if(motorId == 2) {int value = random(400) - 200; acc_stepperID_2.setSpeed(value);}
-  else if(motorId == 3) {int value = random(400) - 200; acc_stepperID_3.setSpeed(value);}
+  //else if(motorId == 3) {int value = random(400) - 200; acc_stepperID_3.setSpeed(value);}
 }
 
 void stopAllDCs(){
@@ -306,11 +313,11 @@ void loop() {
   }
 
   if(velocity_mode){
-    acc_stepperID_2.runSpeed();
-    acc_stepperID_3.runSpeed(); 
+    if(useStepperID_2) acc_stepperID_2.runSpeed();
+    //if(useStepperID_3) acc_stepperID_3.runSpeed(); 
   }else{
-    acc_stepperID_2.run();
-    acc_stepperID_3.run();
+    if(useStepperID_2) acc_stepperID_2.run();
+    //if(useStepperID_3) acc_stepperID_3.run();
   }
 
 }

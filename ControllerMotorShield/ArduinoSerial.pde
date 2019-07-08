@@ -25,7 +25,7 @@ class ArduinoSerial
    
    void sendToArduino(int id, int value)
    {
-      //println("------> Sending to ARDUINO: Servo ID " + id + " WITH speed " + value);
+      //println("-----> Sending to ARDUINO: Servo ID " + id + " WITH speed " + value);
       
       /*
       byte b[] = {64,32};
@@ -58,8 +58,9 @@ class ArduinoSerial
        //print("is listening...");
        if ( port.available() > 0) {  // If data is available,
           String msg = port.readStringUntil('\n');
-          if(msg != null) 
+          if(msg != null) {
             print("Arduino received:",msg);
+          }
        }
        
    }
