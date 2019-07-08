@@ -7,7 +7,7 @@ ControlP5 cp5; // GUI library
 Gui gui; // GUI
 ArduinoSerial arduinoSerial; // Connection with arduino
 
-
+// comment to delete... test
 void setup()
 {
   size(700,550);
