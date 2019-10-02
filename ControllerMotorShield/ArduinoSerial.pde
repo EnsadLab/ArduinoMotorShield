@@ -1,5 +1,6 @@
 
 Serial port;
+boolean portIsOpen = false;
 
 class ArduinoSerial
 {
@@ -9,7 +10,7 @@ class ArduinoSerial
    ArduinoSerial(ControllerMotorShield controller)
    {
      this.controller = controller;
-     String portName = Serial.list()[1]; 
+     
      String[] ports = Serial.list();
      println("Available SERIAL ports:");
      for(int i=0; i<ports.length; i++)
@@ -17,10 +18,18 @@ class ArduinoSerial
        println(ports[i]);
      }
      
+     //in case we do not use the GUI port selector
+     String portName = Serial.list()[1]; 
+     openPort(portName);
+
+   }
+   
+   void openPort(String portName){
      println("----> Trying to open serial port " + portName);
      port = new Serial(controller, portName, 9600);
      // wait a little bit to be sure it is opened correctly
      delay(1000);
+     portIsOpen = true;
    }
    
    void sendToArduino(int id, int value)
@@ -39,8 +48,9 @@ class ArduinoSerial
       port.clear();
       port.write(id);
       // value can go above 256 -> we need two bytes to send the value
-      int firstByte = value>>8;
-      int secondByte = value&0xFF;
+      //char temp = char(value);
+      char firstByte = char(value>>8);
+      char secondByte = char(value&0xFF);
       //println("-----> " + firstByte + " " + secondByte);
       port.write(firstByte);
       port.write(secondByte);
@@ -56,7 +66,7 @@ class ArduinoSerial
    void listen()
    {
        //print("is listening...");
-       if ( port.available() > 0) {  // If data is available,
+       if ( portIsOpen && port.available() > 0) {  // If data is available,
           String msg = port.readStringUntil('\n');
           if(msg != null) {
             print("Arduino received:",msg);

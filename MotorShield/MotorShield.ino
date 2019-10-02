@@ -24,7 +24,7 @@ Adafruit_MotorShield AFMShield(0x60); // Default address, no jumpers... so code 
 
 
 //*** VARIABLE pour Filipe ************************************************************************!
-byte stepper_move_type = DOUBLE; // you can change these to SINGLE, DOUBLE, INTERLEAVE or MICROSTEP!
+byte stepper_move_type = MICROSTEP; // you can change these to SINGLE, DOUBLE, INTERLEAVE or MICROSTEP!
 
 
 
@@ -94,10 +94,11 @@ void setup() {
   // values to play with...... 
   // but there are probably more to play on
   // https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html
-  acc_stepperID_2.setMaxSpeed(0.5);
-  acc_stepperID_2.setAcceleration(0.5);
-  acc_stepperID_3.setMaxSpeed(0.5);
-  acc_stepperID_3.setAcceleration(0.5);
+  // have a look at the examples of the accelstepper library! Menu "File" -> "Examples" -> "AccelStepper"
+  acc_stepperID_2.setMaxSpeed(200);
+  //acc_stepperID_2.setAcceleration(100);
+  acc_stepperID_3.setMaxSpeed(200);
+  //acc_stepperID_3.setAcceleration(100);
 
   delayStart = millis();
 
@@ -118,9 +119,9 @@ void loop() {
     // ...
 
     // to be removed -> cecile
-    //updateTest();
+    updateTest();
     
-  }else if(anim_type == RANDOM){
+  }else if(loop_type == RANDOM){
     
     updateRandom();
     
@@ -147,8 +148,8 @@ void listenToProcessing(){
     bool wait = true;
     int count = 0;
     int dataLength = 3;
-    int dataIn[2];
-    int value;
+    char dataIn[2];
+    char value;
     while(wait) { // stay in this loop until newline is read
       if(Serial.available()) {
         //dataIn[count] = Serial.read();
@@ -176,7 +177,7 @@ void listenToProcessing(){
 }
 
 
-void processDatas(int data[], int dataLength){
+void processDatas(char data[], int dataLength){
   
   // according to the given ID, run the appropriate motor
   for(int i=0; i<dataLength; i += 2){
@@ -254,7 +255,6 @@ void updateTest(){
 
 void updateRandom(){
   if ((millis() - delayStart) >= DELAY_TIME) {
-    DELAY_TIME = 100;
     delayStart = millis();
     triggerRandomPos();
   }
@@ -282,15 +282,17 @@ void triggerRandServos(){
 // triggers one random value for the steppers
 void triggerRandSteppers(){
   
-  int value = random(400) - 200;
+  
   //Serial.println("trigger steppers " + String(value));
   
   if(velocity_mode){
+    int value = random(400) - 200;
     acc_stepperID_2.setSpeed(value);
     acc_stepperID_3.setSpeed(value);
   }else{
     //acc_stepperID_2.setSpeed(value);
     //acc_stepperID_3.setSpeed(value);
+    int value = random(500) + 25;
     acc_stepperID_2.moveTo(value);
     acc_stepperID_3.moveTo(value);
   }

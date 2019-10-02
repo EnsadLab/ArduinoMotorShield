@@ -13,6 +13,7 @@ color blueGreen = 0xff006468;
 
 DropdownList d1;
 
+String portNameGui;
 
 class Gui implements ControlListener
 {
@@ -50,7 +51,6 @@ class Gui implements ControlListener
       .setColorValue(0xff14283b)
       .setFont(fontBig);
       
-    
       
     int yMotors = 170;
     for(int i=0; i<8; i++){
@@ -100,12 +100,16 @@ class Gui implements ControlListener
           .setColorCaptionLabel(color(255))
           ;
  
-     d1.getCaptionLabel().set("PORT"); //set PORT before anything is selected
+     d1.getCaptionLabel().set("ARDUINO PORT"); //set PORT before anything is selected
  
-     //portName = Serial.list()[0]; //0 as default
-     //myPort = new Serial(this, portName, 9600);
+     portNameGui = Serial.list()[0]; //0 as default
+     //port = new Serial(controller, portName, 9600);
+
   }
   
+  String getPortName(){
+    return portNameGui;
+  }
   
   void drawSelectPort(){
      if(d1.isMouseOver()) {
@@ -114,9 +118,9 @@ class Gui implements ControlListener
          d1.addItem(Serial.list()[i], i); 
        }
     }
-  /*if ( myPort.available() > 0) {  //read incoming data from serial port
-    println(myPort.readStringUntil('\n')); //read until new input
-   }*/ 
+    if(portIsOpen && port.available() > 0) {  //read incoming data from serial port
+      println(port.readStringUntil('\n')); //read until new input
+     } 
   }
   
   
@@ -170,7 +174,7 @@ class Gui implements ControlListener
       float value = c.getValue();
       String[] params = split(addr,"_");
       
-      //println("CONTROL EVENT",addr,value);
+      println("CONTROL EVENT",addr,value);
       //for(int i=0; i<params.length; i++){ println(params[i]); }
       
       if(addr.startsWith("/SLIDERMOTORVAL")){
@@ -181,6 +185,13 @@ class Gui implements ControlListener
           else if(motorIndex >= 4 && motorIndex <= 7) { value += abs(minValueDC); }
           arduinoSerial.sendToArduino(motorIndex,int(value));
         }
+      }
+      if (evt.isController() && d1.isMouseOver()) {
+        portNameGui = Serial.list()[int(evt.getController().getValue())]; //port name is set to the selected port in the dropDownMeny
+        //port = new Serial(this, portName, 9600); //Create a new connection
+        arduinoSerial.openPort(portNameGui);
+        println("Serial index set to: " + evt.getController().getValue());
+        delay(2000); 
       }
    }
   
