@@ -1,18 +1,31 @@
-/*************************************************** 
- ****************************************************/
+/***************************************************
+****************************************************
+***************************************************/
+
+ //https://learn.adafruit.com/adafruit-motor-shield-v2-for-arduino
+ //https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html
+
+ /***************************************************
+ ****************************************************
+ ***************************************************/
+ 
+
 
 #include <AccelStepper.h>
 #include <Wire.h>
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
-#include <Adafruit_PWMServoDriver.h> // servos shield - not used for now
+
 #include <Servo.h> 
 
 // Adafruit Motor shield
-Adafruit_MotorShield AFMShield(0x60); // Default address, no jumpers
+Adafruit_MotorShield AFMShield(0x60); // Default address, no jumpers... so code done here for One shield.
 
-// Adafruit 16-servos shield
-// Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(); // not used for now
+
+
+//*** VARIABLE pour Filipe ************************************************************************!
+byte stepper_move_type = DOUBLE; // you can change these to SINGLE, DOUBLE, INTERLEAVE or MICROSTEP!
+
 
 
 // ************************  servos  **************************
@@ -22,87 +35,143 @@ Servo servoID_1;
 
 
 // ***********************  steppers  *************************
+// value is between -200 and 200
 Adafruit_StepperMotor *stepperID_2 = AFMShield.getStepper(200, 1); // M1-M2
 Adafruit_StepperMotor *stepperID_3 = AFMShield.getStepper(200, 2); // M3-M4
-// you can change these to SINGLE, DOUBLE, INTERLEAVE or MICROSTEP!
 void forwardstepID_2() {  
-  stepperID_2->onestep(FORWARD, DOUBLE);
+  stepperID_2->onestep(FORWARD, stepper_move_type);
 }
 void backwardstepID_2() {  
-  stepperID_2->onestep(BACKWARD, DOUBLE);
+  stepperID_2->onestep(BACKWARD, stepper_move_type);
 }
 void forwardstepID_3() {  
-  stepperID_3->onestep(FORWARD, MICROSTEP);
+  stepperID_3->onestep(FORWARD, stepper_move_type);
 }
 void backwardstepID_3() {  
-  stepperID_3->onestep(BACKWARD, MICROSTEP);
+  stepperID_3->onestep(BACKWARD, stepper_move_type);
 }
-// Now we'll wrap the 2 steppers in an AccelStepper object
-AccelStepper acc_stepperID_2(forwardstepID_2, backwardstepID_2); // M1-M2
-//AccelStepper acc_stepperID_2 = NULL; // => to be checked.. doesn't like the null. we should use defines as well.
-//AccelStepper acc_stepperID_3(forwardstepID_3, backwardstepID_3); // M3-M4
-bool useStepperID_2 = true;
-bool useStepperID_3 = false;
+
+AccelStepper acc_stepperID_2(forwardstepID_2, backwardstepID_2); 
+AccelStepper acc_stepperID_3(forwardstepID_3, backwardstepID_3); 
 
 int minValueStepper = -200;
 int maxValueStepper = 200;
 
 bool velocity_mode = true;
 
+
 // **************************  DC  ****************************
 // value is between 0 and 255; we use negative numbers from processing in order to know the direction so from -255 to 255
 int minValueDC = -255;
-// later we'll use an array.
+// later we'll use an array. Or not...
 Adafruit_DCMotor *dc_motor4 = AFMShield.getMotor(1); // M1
-//Adafruit_DCMotor *dc_motor4 = NULL; // M1
-//Adafruit_DCMotor *dc_motor5 = AFMShield.getMotor(2); // M2
-Adafruit_DCMotor *dc_motor5 = NULL; // M2
+Adafruit_DCMotor *dc_motor5 = AFMShield.getMotor(2); // M2
 Adafruit_DCMotor *dc_motor6 = AFMShield.getMotor(3); // M3
-//Adafruit_DCMotor *dc_motor6 = NULL; // M3
 Adafruit_DCMotor *dc_motor7 = AFMShield.getMotor(4); // M4
-//Adafruit_DCMotor *dc_motor7 = NULL; // M4
-
-// *************************  DEBUG  **************************
-// PAS ENCORE FAIT...
-// set the value to 1 if you really want to see debug messages in processing 
-// #define USE_DEBUG 1
-
-int ledPin = 13; // Set the pin to digital I/O 4
 
 
-// *************************  ANIMS  **************************
-typedef enum Anim_type:byte { RANDOM,SINUS,COM } Anim_type;
-Anim_type anim_type = COM; // by default, select COM where we listen to the serial port for processing messages
-//int fakeValues[] = {0,70,40,90,100,20,170,50,70,20,180}; // tests servos
-//int fakeValues[] = {40,140}; // tests servos
-int fakeValues[] = {-200,200}; // tests steppers
-int nbFakeValues =  (sizeof(fakeValues) / sizeof(fakeValues[0]));
-int fakeValueIndex = 0;
-int fakeValueIndexStepper = 0;
+// ************************  SWITCH  *************************
+// in order to easily switch between different kind of loops
+typedef enum Loop_type:byte { RANDOM,COM,TEST } Loop_type;
+Loop_type loop_type = COM; // by default, select COM where we listen to the serial port for processing messages
 
+
+// used in order to trigger random values every two seconds when loop_type is set to RANDOM
 unsigned long DELAY_TIME = 2000; // 2 seconds
 unsigned long delayStart = 0;
-bool delayRunning = false;
+
+
 
 void setup() {
-
-  pinMode(ledPin, OUTPUT); 
+ 
   Serial.begin(9600); // Start serial communication at 9600 bps
-  //Serial.println("Arduino is listening");
 
   AFMShield.begin();
 
-  servoID_0.attach(9); // connection towards the center of the board
-  servoID_1.attach(10); // connection on the board edge
+  servoID_0.attach(9); // servo connection towards the center of the board
+  servoID_1.attach(10); // servo connection on the board edge
 
-  acc_stepperID_2.setMaxSpeed(2000.0); // vitesse ?
-  acc_stepperID_2.setAcceleration(1000);
-  //acc_stepperID_3.setMaxSpeed(2000.0);
-  //acc_stepperID_3.setAcceleration(1000);
+  // values to play with...... 
+  // but there are probably more to play on
+  // https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html
+  acc_stepperID_2.setMaxSpeed(0.5);
+  acc_stepperID_2.setAcceleration(0.5);
+  acc_stepperID_3.setMaxSpeed(0.5);
+  acc_stepperID_3.setAcceleration(0.5);
 
-  DELAY_TIME = 1000;//random(1000,3000); // check if not better to use rand(10) * 100 or something like that...
   delayStart = millis();
-  delayRunning = true;
+
+}
+
+
+void loop() {
+
+  if(loop_type == COM){
+    
+    listenToProcessing();
+    
+  }else if(loop_type == TEST){
+    
+    listenToSerialMonitor();  
+
+    // write whatever you want in order to test different things.
+    // ...
+
+    // to be removed -> cecile
+    //updateTest();
+    
+  }else if(anim_type == RANDOM){
+    
+    updateRandom();
+    
+  }
+
+
+  if(velocity_mode){
+    acc_stepperID_2.runSpeed();
+    acc_stepperID_3.runSpeed(); 
+  }else{
+    acc_stepperID_2.run();
+    acc_stepperID_3.run();
+  }
+  
+
+}
+
+
+void listenToProcessing(){
+
+  if (Serial.available() > 1) {
+    //Serial.println("********** serial available **********"); // seulement si on arrive vraiment a rien lire dans la console
+    //Serial.println('*');
+    bool wait = true;
+    int count = 0;
+    int dataLength = 3;
+    int dataIn[2];
+    int value;
+    while(wait) { // stay in this loop until newline is read
+      if(Serial.available()) {
+        //dataIn[count] = Serial.read();
+        value = Serial.read();
+        if (value == '\n') {
+          wait = false; // exit while loop
+        }else{
+          Serial.println(count);
+          Serial.println(dataIn[count]);
+          if(count == 0) dataIn[0] = value;
+          else if(count == 1) dataIn[1] = value<<8;
+          else if(count == 2) dataIn[1] += value;
+        }
+        count++;
+      }
+    }  
+    //Serial.println(dataIn[0]);
+    //Serial.println(dataIn[1]);
+    
+    processDatas(dataIn,2);
+    //Serial.println("*");
+    //Serial.println("**************************************"); // seulement si on arrive vraiment a rien lire dans la console
+  }
 
 }
 
@@ -128,6 +197,7 @@ void processDatas(int data[], int dataLength){
 }
 
 
+// sends value to servo with given id
 void runServo(int id,int value){
   String s = String("run servo ") + id + String(" with value ") + value;
   // Serial.println(s);
@@ -138,21 +208,26 @@ void runServo(int id,int value){
 }
 
 
+// sends value to stepper with given id
 void runStepper(int id,int value){
   value = value + minValueStepper;
   String s = String("run stepper ") + id + String(" with value ") + value;
   //value = map(value,-200,200,-500,500); // valeur, min, max, minNew, maxNew => pour tester rapidement
   //Serial.println(s);
-  if(id == 2 && useStepperID_2){
+  if(id == 2)
+  {
     if(velocity_mode) acc_stepperID_2.setSpeed(value);
     else acc_stepperID_2.moveTo(value);
   }
-  else if(id == 3 && useStepperID_3){
-    //if(velocity_mode) acc_stepperID_3.setSpeed(value);
-    //else acc_stepperID_3.moveTo(value);
+  else if(id == 3)
+  {
+    if(velocity_mode) acc_stepperID_3.setSpeed(value);
+    else acc_stepperID_3.moveTo(value);
   }
 }
 
+
+// sends value to DC with given id
 void runDC(int id,int value){
   Adafruit_DCMotor *dc_motor;
   if(id == 4) dc_motor = dc_motor4;
@@ -168,106 +243,77 @@ void runDC(int id,int value){
   }
 }
 
-void listenToCom(){
 
-  if (Serial.available() > 1) {
-    //Serial.println("********** serial available **********"); // seulement si on arrive vraiment a rien lire dans la console
-    //Serial.println('*');
-    bool wait = true;
-    int count = 0;
-    int dataLength = 3;
-    int dataIn[2];
-    int value;
-    while(wait) { // stay in this loop until newline is read
-      if(Serial.available()) {
-        //dataIn[count] = Serial.read();
-        value = Serial.read();
-        if (value == '\n') {
-          wait = false; // exit while loop
-        }else{
-          //Serial.println(count);
-          //Serial.println(dataIn[count]);
-          if(count == 0) dataIn[0] = value;
-          else if(count == 1) dataIn[1] = value<<8;
-          else if(count == 2) dataIn[1] += value;
-        }
-        count++;
-      }
-    }  
-    //Serial.println(dataIn[0]);
-    //Serial.println(dataIn[1]);
-    
-    processDatas(dataIn,2);
-    //Serial.println("*");
-    //Serial.println("**************************************"); // seulement si on arrive vraiment a rien lire dans la console
-  }
-
+// to be removed... -> cecile
+void updateTest(){
+  triggerRandServos();
+  triggerRandSteppers();
+  triggerRandDCs();
 }
-
 
 
 void updateRandom(){
-  if (delayRunning && ((millis() - delayStart) >= DELAY_TIME)) {
-    DELAY_TIME = 100;//random(1000,3000); // check if not better to use rand(10) * 100 or something like that...
+  if ((millis() - delayStart) >= DELAY_TIME) {
+    DELAY_TIME = 100;
     delayStart = millis();
     triggerRandomPos();
-    //delayRunning = false; // keep running... uncomment if you want to stop running
   }
 }
 
+
+// triggers random positions for the servos, steppers and DCs
 void triggerRandomPos(){
-  
-  triggerServos();
-  triggerSteppers();
-  triggerDCs();
 
-  // ou si on veut updater qu'un moteur à chaque trigger...
-  //triggerUniqueRandomMotor(); // servos + steppers for now
+  triggerRandServos();
+  triggerRandSteppers();
+  triggerRandDCs();
   
 }
 
 
-void triggerServos(){
-  int value =  fakeValues[fakeValueIndex];
-  fakeValueIndex++;
-  if(fakeValueIndex >= nbFakeValues){
-    fakeValueIndex = 0;  
-  }
+// triggers one random value for both servos
+void triggerRandServos(){
+  int value =  random(200);
   servoID_0.write(value);
   servoID_1.write(value);
 }
 
 
-void triggerSteppers(){
+// triggers one random value for the steppers
+void triggerRandSteppers(){
+  
   int value = random(400) - 200;
- // int value =  fakeValues[fakeValueIndexStepper];
-  fakeValueIndexStepper++;
-  if(fakeValueIndexStepper >= nbFakeValues){
-    fakeValueIndexStepper = 0;  
-  }
+  //Serial.println("trigger steppers " + String(value));
+  
   if(velocity_mode){
-    if(useStepperID_2) acc_stepperID_2.setSpeed(value);
-    //if(useStepperID_3) acc_stepperID_3.setSpeed(value);
+    acc_stepperID_2.setSpeed(value);
+    acc_stepperID_3.setSpeed(value);
   }else{
-    if(useStepperID_2) acc_stepperID_2.setSpeed(value);
-    //if(useStepperID_3) acc_stepperID_3.setSpeed(value);
-    if(useStepperID_2) acc_stepperID_2.moveTo(value);
-    //if(useStepperID_3) acc_stepperID_3.moveTo(value);
-    
+    //acc_stepperID_2.setSpeed(value);
+    //acc_stepperID_3.setSpeed(value);
+    acc_stepperID_2.moveTo(value);
+    acc_stepperID_3.moveTo(value);
   }
+  
 }
 
-void triggerDCs(){
+
+// triggers one random value for the DC motor
+void triggerRandDCs(){
+  
   int value = random(500) + minValueDC;
-  //triggerDC(4,value);
+  //Serial.println("trigger DC:"+ String(value));
+  triggerDC(4,value);
   value = random(500) + minValueDC;
-  //triggerDC(5,value);
+  triggerDC(5,value);
   value = random(500) + minValueDC;
   triggerDC(6,value);
   value = random(500) + minValueDC;
   triggerDC(7,value);
 }
 
+
+// sends a value to the DC motor with the given id
 void triggerDC(int id,int value){
   Adafruit_DCMotor *dc_motor = NULL;
   if(id == 4) dc_motor = dc_motor4;
@@ -284,16 +330,8 @@ void triggerDC(int id,int value){
 
 }
 
-// TO BE TESTED.. so do not use for now
-void triggerUniqueRandomMotor(){
-  int motorId = random(4);
-  //int motorId = 5; // la suite va etre ignoré
-  if(motorId == 0) {int value = random(0,180); servoID_0.write(value);}
-  else if(motorId == 1) {int value = random(0,180); servoID_1.write(value);}
-  if(motorId == 2) {int value = random(400) - 200; acc_stepperID_2.setSpeed(value);}
-  //else if(motorId == 3) {int value = random(400) - 200; acc_stepperID_3.setSpeed(value);}
-}
 
+// stops all DC motors
 void stopAllDCs(){
   if(dc_motor4 != NULL) dc_motor4->run(RELEASE);  
   if(dc_motor5 != NULL) dc_motor5->run(RELEASE); 
@@ -301,23 +339,20 @@ void stopAllDCs(){
   if(dc_motor7 != NULL) dc_motor7->run(RELEASE); 
 }
 
-void loop() {
 
-  //stopAllDCs();
-  //return;
-
-  if(anim_type == COM){
-    listenToCom();
-  }else if(anim_type == RANDOM){
-    updateRandom();
-  }
-
-  if(velocity_mode){
-    if(useStepperID_2) acc_stepperID_2.runSpeed();
-    //if(useStepperID_3) acc_stepperID_3.runSpeed(); 
-  }else{
-    if(useStepperID_2) acc_stepperID_2.run();
-    //if(useStepperID_3) acc_stepperID_3.run();
-  }
-
+// could be useful... in order to send directly entries to the arduino serial monitor
+void listenToSerialMonitor(){
+ 
+  if (Serial.available() > 0) {
+    char rx_byte = Serial.read();
+    
+    if(rx_byte == '0'){
+      Serial.println("is a zero");
+    }else if(rx_byte == '1'){
+      Serial.println("is a one");
+    }
+    
+  } 
 }
+
+

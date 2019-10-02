@@ -7,9 +7,16 @@ PFont fontBig;
 PFont fontMiddle;
 PFont fontSmall;
 
+color darkBlue = 0xff14283b;
+color turqoise = 0xff17a1a5;
+color blueGreen = 0xff006468;
+
+DropdownList d1;
+
 
 class Gui implements ControlListener
 {
+  
   int nbMotors = 8;
   Slider[] sliders = new Slider[nbMotors];
   int minValueServo = 0;
@@ -19,40 +26,48 @@ class Gui implements ControlListener
   int minValueDC = -255;
   int maxValueDC = 255;
   
+  
   Gui()
   {
+    
     fontBig = createFont("Verdana",16,true); 
     fontMiddle = createFont("Verdana",14,true); 
     fontSmall = createFont("Verdana",12,true); 
     
-    cp5.setColorForeground(0xffaa0000);
-    cp5.setColorBackground(0xff660000);
+    cp5.setColorForeground(turqoise);
+    cp5.setColorBackground(blueGreen);
     cp5.setFont(fontBig);
-    cp5.setColorActive(0xffff0000);
+    cp5.setColorActive(darkBlue);
+
   }
   
   void setup(){
     
-    int y = 40;
+    int yTitle = 80;
     cp5.addTextlabel("MOTORS_gui_main")
       .setText("MOTORS")
-      .setPosition(50,40)
+      .setPosition(50,yTitle)
+      .setColorValue(0xff14283b)
       .setFont(fontBig);
       
-    y = 100;
+    
+      
+    int yMotors = 170;
     for(int i=0; i<8; i++){
+      
       int minv = minValueServo;
       int maxv = maxValueServo;
       if(i == 2 || i == 3) { minv = minValueStepper; maxv = maxValueStepper; }
       else if(i >= 4 && i <= 7) { minv = minValueDC; maxv = maxValueDC; }
       // parameters : name, minimum, maximum, default value (float), x, y, width, height
-      sliders[i] = cp5.addSlider("SLIDERMOTORVAL_" + i,minv,maxv,0.5*(maxv-minv)+minv,250,y,300,30);
+      sliders[i] = cp5.addSlider("SLIDERMOTORVAL_" + i,minv,maxv,0.5*(maxv-minv)+minv,250,yMotors,300,30);
       sliders[i].setSliderMode(Slider.FLEXIBLE);
+      sliders[i].setColorValue(darkBlue);
       sliders[i].getValueLabel().align(ControlP5.RIGHT_OUTSIDE, ControlP5.CENTER).setFont(fontMiddle);
       sliders[i].getCaptionLabel().setVisible(false);
       sliders[i].addListener(this);
       
-      Textlabel label = cp5.addTextlabel("LABELMOTORVAL_"+i).setText("motor"+i).setPosition(50,y+5).setFont(fontSmall).setColor(color(255,255,255));
+      Textlabel label = cp5.addTextlabel("LABELMOTORVAL_"+i).setText("motor"+i).setPosition(50,yMotors+5).setFont(fontSmall).setColor(darkBlue);
       if(i== 0) label.setText("Servo motor 0(pin 9 - center)");
       else if(i == 1) label.setText("Servo motor 1(pin 10 - edge)");
       else if(i == 2) label.setText("Stepper motor 2(M1-M2)");
@@ -62,10 +77,48 @@ class Gui implements ControlListener
       else if(i == 6) label.setText("DC motor 6(M3)");
       else if(i == 7) label.setText("DC motor 7(M4)");
       
-      y += 50;
+      yMotors += 50;
+      
     }
-   
+    
+    setupSelectPort(yTitle);
+    
   }
+  
+  
+  void setupSelectPort(int y){
+    d1 = cp5.addDropdownList("myList-d1")
+          .setPosition(250, y)
+          .setSize(300, 25)
+          .setHeight(150)
+          .setItemHeight(25)
+          .setBarHeight(25)
+          .setFont(fontSmall)
+          .setColorBackground(darkBlue)
+          .setColorForeground(blueGreen)
+          .setColorActive(darkBlue)
+          .setColorCaptionLabel(color(255))
+          ;
+ 
+     d1.getCaptionLabel().set("PORT"); //set PORT before anything is selected
+ 
+     //portName = Serial.list()[0]; //0 as default
+     //myPort = new Serial(this, portName, 9600);
+  }
+  
+  
+  void drawSelectPort(){
+     if(d1.isMouseOver()) {
+       d1.clear(); 
+       for (int i=0;i<Serial.list().length;i++) {
+         d1.addItem(Serial.list()[i], i); 
+       }
+    }
+  /*if ( myPort.available() > 0) {  //read incoming data from serial port
+    println(myPort.readStringUntil('\n')); //read until new input
+   }*/ 
+  }
+  
   
   void setMotorValueFromMidi(int motorIndex, int midiValue)
   {
@@ -80,6 +133,7 @@ class Gui implements ControlListener
     }
   }
   
+  
   void reset(int motorIndex)
   {
     int minv = minValueServo;
@@ -92,6 +146,7 @@ class Gui implements ControlListener
     } 
   }
   
+  
   void resetAll()
   {
     for(int i=0; i<sliders.length; i++)
@@ -103,6 +158,7 @@ class Gui implements ControlListener
        sliders[i].setValue(0.5*(maxv-minv)); 
     }
   }
+ 
  
   void controlEvent(ControlEvent evt)
    {
@@ -127,5 +183,6 @@ class Gui implements ControlListener
         }
       }
    }
+  
   
 };

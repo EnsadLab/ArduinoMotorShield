@@ -7,10 +7,11 @@ ControlP5 cp5; // GUI library
 Gui gui; // GUI
 ArduinoSerial arduinoSerial; // Connection with arduino
 
+
 // comment to delete... test
 void setup()
 {
-  size(700,550);
+  size(650,650);
   
   // initialise
   cp5 = new ControlP5(this);
@@ -26,8 +27,9 @@ void setup()
 
 void draw() 
 {
-  background(0);
+  background(255);
   arduinoSerial.listen();
+  gui.drawSelectPort();
 }
 
 
