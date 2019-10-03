@@ -188,7 +188,7 @@ class Gui implements ControlListener
       float value = c.getValue();
       String[] params = split(addr,"_");
       
-      println("CONTROL EVENT",addr,value);
+      //println("CONTROL EVENT",addr,value);
       //for(int i=0; i<params.length; i++){ println(params[i]); }
       
       if(addr.startsWith("/SLIDERMOTORVAL")){

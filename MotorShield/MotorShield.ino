@@ -96,9 +96,9 @@ void setup() {
   // https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html
   // have a look at the examples of the accelstepper library! Menu "File" -> "Examples" -> "AccelStepper"
   acc_stepperID_2.setMaxSpeed(200);
-  //acc_stepperID_2.setAcceleration(100);
+  acc_stepperID_2.setAcceleration(100);
   acc_stepperID_3.setMaxSpeed(200);
-  //acc_stepperID_3.setAcceleration(100);
+  acc_stepperID_3.setAcceleration(100);
 
   delayStart = millis();
 
@@ -148,8 +148,8 @@ void listenToProcessing(){
     bool wait = true;
     int count = 0;
     int dataLength = 3;
-    char dataIn[2];
-    char value;
+    int dataIn[2];
+    int value;
     while(wait) { // stay in this loop until newline is read
       if(Serial.available()) {
         //dataIn[count] = Serial.read();
@@ -177,7 +177,7 @@ void listenToProcessing(){
 }
 
 
-void processDatas(char data[], int dataLength){
+void processDatas(int data[], int dataLength){
   
   // according to the given ID, run the appropriate motor
   for(int i=0; i<dataLength; i += 2){

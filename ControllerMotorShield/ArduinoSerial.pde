@@ -49,8 +49,9 @@ class ArduinoSerial
       port.write(id);
       // value can go above 256 -> we need two bytes to send the value
       //char temp = char(value);
-      char firstByte = char(value>>8);
-      char secondByte = char(value&0xFF);
+      // euh...... c'est quoi ce bordel... j'ai utilisé des int alors que je parle de char...
+      int firstByte = value>>8;
+      int secondByte = value&0xFF;
       //println("-----> " + firstByte + " " + secondByte);
       port.write(firstByte);
       port.write(secondByte);
