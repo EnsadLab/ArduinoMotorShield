@@ -26,7 +26,7 @@ class ArduinoSerial
    
    void openPort(String portName){
      println("----> Trying to open serial port " + portName);
-     port = new Serial(controller, portName, 9600);
+     port = new Serial(this.controller, portName, 9600);
      // wait a little bit to be sure it is opened correctly
      delay(1000);
      portIsOpen = true;

@@ -103,6 +103,7 @@ class Gui implements ControlListener
      d1.getCaptionLabel().set("ARDUINO PORT"); //set PORT before anything is selected
  
      portNameGui = Serial.list()[0]; //0 as default
+     arduinoSerial.openPort(portNameGui);
      //port = new Serial(controller, portName, 9600);
 
   }
@@ -166,7 +167,20 @@ class Gui implements ControlListener
  
   void controlEvent(ControlEvent evt)
    {
-     if(!evt.isController())
+     /*
+     println("start");
+     port.clear();
+     port.stop();
+     if (evt.isController() && d1.isMouseOver()) {
+        println("coucou");
+        portNameGui = Serial.list()[int(evt.getController().getValue())]; //port name is set to the selected port in the dropDownMeny
+        //port = new Serial(this, portName, 9600); //Create a new connection
+        arduinoSerial.openPort(portNameGui);
+        println("Serial index set to: " + evt.getController().getValue());
+        delay(2000); 
+      }*/
+      
+      if(!evt.isController())
       return;
       
       Controller c = evt.getController();
@@ -186,13 +200,7 @@ class Gui implements ControlListener
           arduinoSerial.sendToArduino(motorIndex,int(value));
         }
       }
-      if (evt.isController() && d1.isMouseOver()) {
-        portNameGui = Serial.list()[int(evt.getController().getValue())]; //port name is set to the selected port in the dropDownMeny
-        //port = new Serial(this, portName, 9600); //Create a new connection
-        arduinoSerial.openPort(portNameGui);
-        println("Serial index set to: " + evt.getController().getValue());
-        delay(2000); 
-      }
+      
    }
   
   
