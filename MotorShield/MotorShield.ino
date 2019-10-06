@@ -24,7 +24,7 @@ Adafruit_MotorShield AFMShield(0x60); // Default address, no jumpers... so code 
 
 
 //*** VARIABLE pour Filipe ************************************************************************!
-byte stepper_move_type = MICROSTEP; // you can change these to SINGLE, DOUBLE, INTERLEAVE or MICROSTEP!
+byte stepper_move_type = SINGLE; // you can change these to SINGLE, DOUBLE, INTERLEAVE or MICROSTEP!
 
 
 
@@ -95,10 +95,10 @@ void setup() {
   // but there are probably more to play on
   // https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html
   // have a look at the examples of the accelstepper library! Menu "File" -> "Examples" -> "AccelStepper"
-  acc_stepper__2.setMaxSpeed(200);
-  acc_stepper__2.setAcceleration(100);
-  acc_stepper__3.setMaxSpeed(200);
-  acc_stepper__3.setAcceleration(100);
+  acc_stepper__2.setMaxSpeed(500);
+  //acc_stepper__2.setAcceleration(100);
+  acc_stepper__3.setMaxSpeed(500);
+  //acc_stepper__3.setAcceleration(100);
 
   delayStart = millis();
 
