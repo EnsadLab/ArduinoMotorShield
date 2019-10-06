@@ -3,7 +3,7 @@ import controlP5.*;  // GUI library
 import themidibus.*; // MIDI library
 
 
-ControlP5 cp5; // GUI library
+ControlP5 cp5; // cp5 library used for all gui elements
 Gui gui; // GUI
 ArduinoSerial arduinoSerial; // Connection with arduino
 
@@ -17,6 +17,7 @@ void setup()
   cp5 = new ControlP5(this);
   arduinoSerial = new ArduinoSerial(this); // check on the console if serial port has been detected correctly
   gui = new Gui();
+  
   gui.setup();
   
   

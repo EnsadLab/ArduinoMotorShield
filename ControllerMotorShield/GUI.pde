@@ -3,6 +3,7 @@ import processing.serial.*;
 import controlP5.*;
 
 
+
 PFont fontBig;
 PFont fontMiddle;
 PFont fontSmall;
@@ -11,7 +12,7 @@ color darkBlue = 0xff14283b;
 color turqoise = 0xff17a1a5;
 color blueGreen = 0xff006468;
 
-DropdownList d1;
+DropdownList ddlist;
 
 String portNameGui;
 
@@ -30,6 +31,7 @@ class Gui implements ControlListener
   
   Gui()
   {
+    
     
     fontBig = createFont("Verdana",16,true); 
     fontMiddle = createFont("Verdana",14,true); 
@@ -87,7 +89,7 @@ class Gui implements ControlListener
   
   
   void setupSelectPort(int y){
-    d1 = cp5.addDropdownList("myList-d1")
+    ddlist = cp5.addDropdownList("PORTS")
           .setPosition(250, y)
           .setSize(300, 25)
           .setHeight(150)
@@ -100,12 +102,11 @@ class Gui implements ControlListener
           .setColorCaptionLabel(color(255))
           ;
  
-     d1.getCaptionLabel().set("ARDUINO PORT"); //set PORT before anything is selected
- 
+     ddlist.getCaptionLabel().set("ARDUINO PORT"); //set PORT before anything is selected
+     ddlist.addListener(this);
+     
      portNameGui = Serial.list()[0]; //0 as default
-     //arduinoSerial.openPort(portNameGui);
-     //port = new Serial(controller, portName, 9600);
-
+     arduinoSerial.openPort(portNameGui);
   }
   
   String getPortName(){
@@ -113,10 +114,11 @@ class Gui implements ControlListener
   }
   
   void drawSelectPort(){
-     if(d1.isMouseOver()) {
-       d1.clear(); 
+ 
+    if(ddlist.isMouseOver()) {
+       ddlist.clear(); 
        for (int i=0;i<Serial.list().length;i++) {
-         d1.addItem(Serial.list()[i], i); 
+         ddlist.addItem(Serial.list()[i], i); 
        }
     }
     if(portIsOpen && port.available() > 0) {  //read incoming data from serial port
@@ -167,29 +169,25 @@ class Gui implements ControlListener
  
   void controlEvent(ControlEvent evt)
    {
-     /*
-     println("start");
-     port.clear();
-     port.stop();
-     if (evt.isController() && d1.isMouseOver()) {
-        println("coucou");
-        portNameGui = Serial.list()[int(evt.getController().getValue())]; //port name is set to the selected port in the dropDownMeny
-        //port = new Serial(this, portName, 9600); //Create a new connection
-        arduinoSerial.openPort(portNameGui);
-        println("Serial index set to: " + evt.getController().getValue());
-        delay(2000); 
-      }*/
-      
+
       if(!evt.isController())
-      return;
+        return;
       
       Controller c = evt.getController();
       String addr = c.getAddress();
       float value = c.getValue();
       String[] params = split(addr,"_");
       
+      //for debugging purposes...
       //println("CONTROL EVENT",addr,value);
-      //for(int i=0; i<params.length; i++){ println(params[i]); }
+      //for(int i=0; i<params.length; i++){ println(i,":",params[i]); }
+      
+      if (ddlist.isMouseOver() && addr.startsWith("/PORTS")) {
+         port.clear();
+         port.stop();
+         portNameGui = Serial.list()[int(evt.getController().getValue())]; //port name is set to the selected port in the dropDownMenu
+         arduinoSerial.openPort(portNameGui);
+      }
       
       if(addr.startsWith("/SLIDERMOTORVAL")){
         if(params.length >= 2){

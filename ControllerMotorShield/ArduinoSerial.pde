@@ -19,8 +19,9 @@ class ArduinoSerial
      }
      
      //in case we do not use the GUI port selector
+     //set the portname manually and uncomment the openPort(...) line
      String portName = Serial.list()[1]; 
-     openPort(portName);
+     //openPort(portName);
 
    }
    
@@ -29,7 +30,7 @@ class ArduinoSerial
      port = new Serial(this.controller, portName, 9600);
      // wait a little bit to be sure it is opened correctly
      delay(1000);
-     portIsOpen = false;
+     portIsOpen = true;
    }
    
    void sendToArduino(int id, int value)

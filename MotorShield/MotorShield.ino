@@ -157,8 +157,8 @@ void listenToProcessing(){
         if (value == '\n') {
           wait = false; // exit while loop
         }else{
-          Serial.println(count);
-          Serial.println(dataIn[count]);
+          //Serial.println(count);
+          //Serial.println(dataIn[count]);
           if(count == 0) dataIn[0] = value;
           else if(count == 1) dataIn[1] = value<<8;
           else if(count == 2) dataIn[1] += value;
