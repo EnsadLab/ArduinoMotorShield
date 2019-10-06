@@ -29,13 +29,13 @@ byte stepper_move_type = SINGLE; // you can change these to SINGLE, DOUBLE, INTE
 
 
 // ************************  servos  **************************
-// value is between 0 and 180
+// speed value is between 0 and 180 (for the adafruit shield)
 Servo servo__0;
 Servo servo__1;
 
 
 // ***********************  steppers  *************************
-// value is between -200 and 200
+// value is between -200 and 200 with the stepper I have used... so 200 steps per revolution or/and 1.8 step angle
 Adafruit_StepperMotor *stepper__2 = AFMShield.getStepper(200, 1); // M1-M2
 Adafruit_StepperMotor *stepper__3 = AFMShield.getStepper(200, 2); // M3-M4
 void forwardstepID_2() {  
@@ -61,7 +61,8 @@ bool velocity_mode = true;
 
 
 // **************************  DC  ****************************
-// value is between 0 and 255; we use negative numbers from processing in order to know the direction so from -255 to 255
+// speed value is between 0 and 255 (for the adafruit shield)
+// we use negative numbers from processing in order to know the direction so from -255 to 255
 int minValueDC = -255;
 // later we'll use an array. Or not...
 Adafruit_DCMotor *dc_motor4 = AFMShield.getMotor(1); // M1
@@ -95,9 +96,9 @@ void setup() {
   // but there are probably more to play on
   // https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html
   // have a look at the examples of the accelstepper library! Menu "File" -> "Examples" -> "AccelStepper"
-  acc_stepper__2.setMaxSpeed(500);
+  acc_stepper__2.setMaxSpeed(200);
   //acc_stepper__2.setAcceleration(100);
-  acc_stepper__3.setMaxSpeed(500);
+  acc_stepper__3.setMaxSpeed(200);
   //acc_stepper__3.setAcceleration(100);
 
   delayStart = millis();

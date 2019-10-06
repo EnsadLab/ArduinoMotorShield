@@ -40,7 +40,7 @@ class ArduinoSerial
       /*
       byte b[] = {64,32};
       b[0] = byte(id);
-      b[1] = byte(value);//byte(value - 200);
+      b[1] = byte(...);
       port.clear();
       port.write(b[0]);
       port.write(b[1]);
@@ -49,8 +49,7 @@ class ArduinoSerial
       port.clear();
       port.write(id);
       // value can go above 256 -> we need two bytes to send the value
-      //char temp = char(value);
-      // euh...... c'est quoi ce bordel... j'ai utilisé des int alors que je parle de char...
+      // euh...... c'est quoi ce bordel... j'ai utilisé des int alors que je parle de char/byte...
       int firstByte = value>>8;
       int secondByte = value&0xFF;
       //println("-----> " + firstByte + " " + secondByte);
