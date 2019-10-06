@@ -103,7 +103,7 @@ class Gui implements ControlListener
      d1.getCaptionLabel().set("ARDUINO PORT"); //set PORT before anything is selected
  
      portNameGui = Serial.list()[0]; //0 as default
-     arduinoSerial.openPort(portNameGui);
+     //arduinoSerial.openPort(portNameGui);
      //port = new Serial(controller, portName, 9600);
 
   }

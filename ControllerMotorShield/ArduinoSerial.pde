@@ -29,7 +29,7 @@ class ArduinoSerial
      port = new Serial(this.controller, portName, 9600);
      // wait a little bit to be sure it is opened correctly
      delay(1000);
-     portIsOpen = true;
+     portIsOpen = false;
    }
    
    void sendToArduino(int id, int value)

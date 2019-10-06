@@ -30,29 +30,29 @@ byte stepper_move_type = MICROSTEP; // you can change these to SINGLE, DOUBLE, I
 
 // ************************  servos  **************************
 // value is between 0 and 180
-Servo servoID_0;
-Servo servoID_1;
+Servo servo__0;
+Servo servo__1;
 
 
 // ***********************  steppers  *************************
 // value is between -200 and 200
-Adafruit_StepperMotor *stepperID_2 = AFMShield.getStepper(200, 1); // M1-M2
-Adafruit_StepperMotor *stepperID_3 = AFMShield.getStepper(200, 2); // M3-M4
+Adafruit_StepperMotor *stepper__2 = AFMShield.getStepper(200, 1); // M1-M2
+Adafruit_StepperMotor *stepper__3 = AFMShield.getStepper(200, 2); // M3-M4
 void forwardstepID_2() {  
-  stepperID_2->onestep(FORWARD, stepper_move_type);
+  stepper__2->onestep(FORWARD, stepper_move_type);
 }
 void backwardstepID_2() {  
-  stepperID_2->onestep(BACKWARD, stepper_move_type);
+  stepper__2->onestep(BACKWARD, stepper_move_type);
 }
 void forwardstepID_3() {  
-  stepperID_3->onestep(FORWARD, stepper_move_type);
+  stepper__3->onestep(FORWARD, stepper_move_type);
 }
 void backwardstepID_3() {  
-  stepperID_3->onestep(BACKWARD, stepper_move_type);
+  stepper__3->onestep(BACKWARD, stepper_move_type);
 }
 
-AccelStepper acc_stepperID_2(forwardstepID_2, backwardstepID_2); 
-AccelStepper acc_stepperID_3(forwardstepID_3, backwardstepID_3); 
+AccelStepper acc_stepper__2(forwardstepID_2, backwardstepID_2); 
+AccelStepper acc_stepper__3(forwardstepID_3, backwardstepID_3); 
 
 int minValueStepper = -200;
 int maxValueStepper = 200;
@@ -88,17 +88,17 @@ void setup() {
 
   AFMShield.begin();
 
-  servoID_0.attach(9); // servo connection towards the center of the board
-  servoID_1.attach(10); // servo connection on the board edge
+  servo__0.attach(9); // servo connection towards the center of the board
+  servo__1.attach(10); // servo connection on the board edge
 
   // values to play with...... 
   // but there are probably more to play on
   // https://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html
   // have a look at the examples of the accelstepper library! Menu "File" -> "Examples" -> "AccelStepper"
-  acc_stepperID_2.setMaxSpeed(200);
-  acc_stepperID_2.setAcceleration(100);
-  acc_stepperID_3.setMaxSpeed(200);
-  acc_stepperID_3.setAcceleration(100);
+  acc_stepper__2.setMaxSpeed(200);
+  acc_stepper__2.setAcceleration(100);
+  acc_stepper__3.setMaxSpeed(200);
+  acc_stepper__3.setAcceleration(100);
 
   delayStart = millis();
 
@@ -129,11 +129,11 @@ void loop() {
 
 
   if(velocity_mode){
-    acc_stepperID_2.runSpeed();
-    acc_stepperID_3.runSpeed(); 
+    acc_stepper__2.runSpeed();
+    acc_stepper__3.runSpeed(); 
   }else{
-    acc_stepperID_2.run();
-    acc_stepperID_3.run();
+    acc_stepper__2.run();
+    acc_stepper__3.run();
   }
   
 
@@ -204,8 +204,8 @@ void runServo(int id,int value){
   // Serial.println(s);
   // servo library needs a number between 0 and 180
   // servoID_0.write(map(i, 0, 255, 0, 180));
-  if(id == 0) servoID_0.write(value);
-  else if(id == 1) servoID_1.write(value);
+  if(id == 0) servo__0.write(value);
+  else if(id == 1) servo__1.write(value);
 }
 
 
@@ -217,13 +217,13 @@ void runStepper(int id,int value){
   //Serial.println(s);
   if(id == 2)
   {
-    if(velocity_mode) acc_stepperID_2.setSpeed(value);
-    else acc_stepperID_2.moveTo(value);
+    if(velocity_mode) acc_stepper__2.setSpeed(value);
+    else acc_stepper__2.moveTo(value);
   }
   else if(id == 3)
   {
-    if(velocity_mode) acc_stepperID_3.setSpeed(value);
-    else acc_stepperID_3.moveTo(value);
+    if(velocity_mode) acc_stepper__3.setSpeed(value);
+    else acc_stepper__3.moveTo(value);
   }
 }
 
@@ -274,8 +274,8 @@ void triggerRandomPos(){
 // triggers one random value for both servos
 void triggerRandServos(){
   int value =  random(200);
-  servoID_0.write(value);
-  servoID_1.write(value);
+  servo__0.write(value);
+  servo__1.write(value);
 }
 
 
@@ -287,14 +287,14 @@ void triggerRandSteppers(){
   
   if(velocity_mode){
     int value = random(400) - 200;
-    acc_stepperID_2.setSpeed(value);
-    acc_stepperID_3.setSpeed(value);
+    acc_stepper__2.setSpeed(value);
+    acc_stepper__3.setSpeed(value);
   }else{
     //acc_stepperID_2.setSpeed(value);
     //acc_stepperID_3.setSpeed(value);
     int value = random(500) + 25;
-    acc_stepperID_2.moveTo(value);
-    acc_stepperID_3.moveTo(value);
+    acc_stepper__2.moveTo(value);
+    acc_stepper__3.moveTo(value);
   }
   
 }
