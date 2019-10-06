@@ -290,8 +290,6 @@ void triggerRandSteppers(){
     acc_stepper__2.setSpeed(value);
     acc_stepper__3.setSpeed(value);
   }else{
-    //acc_stepperID_2.setSpeed(value);
-    //acc_stepperID_3.setSpeed(value);
     int value = random(500) + 25;
     acc_stepper__2.moveTo(value);
     acc_stepper__3.moveTo(value);
