@@ -106,7 +106,7 @@ class Gui implements ControlListener
      ddlist.addListener(this);
      
      portNameGui = Serial.list()[0]; //0 as default
-     arduinoSerial.openPort(portNameGui);
+     //arduinoSerial.openPort(portNameGui);
   }
   
   String getPortName(){
@@ -183,7 +183,9 @@ class Gui implements ControlListener
       //for(int i=0; i<params.length; i++){ println(i,":",params[i]); }
       
       if (ddlist.isMouseOver() && addr.startsWith("/PORTS")) {
-         port.clear();
+         if(portIsOpen){
+           port.clear();
+         }
          port.stop();
          portNameGui = Serial.list()[int(evt.getController().getValue())]; //port name is set to the selected port in the dropDownMenu
          arduinoSerial.openPort(portNameGui);
